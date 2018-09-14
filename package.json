@@ -1,11 +1,11 @@
 {
-  "name": "react-openseadragon-example",
+  "name": "react-openseadragon-annotation",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "prop-types": "^15.6.2",
     "react": "^16.5.0",
-    "react-dom": "^16.5.0",
-    "@medmain/react-openseadragon": "^0.1.0"
+    "react-dom": "^16.5.0"
   },
   "devDependencies": {
     "react-scripts": "1.1.5"

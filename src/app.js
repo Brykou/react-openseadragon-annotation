@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import OpenSeadragon from '@medmain/react-openseadragon';
+import OpenSeadragon from './react-openseadragon';
 
 class App extends Component {
   render() {
