@@ -1,5 +1,5 @@
 import React from 'react';
-import { debounce } from 'lodash';
+import { debounce, get } from 'lodash';
 import classNames from 'classnames';
 import Overlay from './Overlay';
 import './Annotator.css';
@@ -11,29 +11,34 @@ export default class Annotator extends React.Component {
     this.state = {
       currentShape: [],
       shapeList: [],
-      openSeadragonViewport: null,
-      isDrawingMode: false
+      openSeadragon: null,
+      isDrawingMode: true
     };
   }
 
   componentDidMount() {
-    const intervalId = setInterval(() => {
-      if (window.openSeadragon !== null) {
-        clearInterval(intervalId);
-        this.setState({ openSeadragonViewport: window.openSeadragon.instance.viewport });
-      }
-    }, 1000);
-    document.addEventListener('keydown', this.onKeyDown);
-    this.container = document.getElementById('annotator');
-    this.container.addEventListener('mousedown', this.onMouseDown);
+    if (get(window, 'openSeadragon.instance', null) === null) {
+      const intervalId = setInterval(() => {
+        if (get(window, 'openSeadragon.instance', null) !== null) {
+          this.setState({ openSeadragon: window.openSeadragon.instance });
+
+          document.addEventListener('keydown', this.onKeyDown);
+          this.container = document.getElementById('annotator');
+          this.container.addEventListener('mousedown', this.onMouseDown);
+
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    }
   }
 
   componentWillUnmount() {
     this.container.removeEventListener('mousedown', this.onMouseDown);
+    document.removeEventListener('keydown', this.onKeyDown);
   }
 
   onKeyDown = event => {
-    if (event.key == 'Enter') {
+    if (event.key === 'Enter') {
       this.setState(prevState => ({
         isDrawingMode: !prevState.isDrawingMode
       }));
@@ -60,23 +65,38 @@ export default class Annotator extends React.Component {
 
   onMouseMove = debounce(
     event => {
+      const viewport = this.computeViewport();
+
+      const x = ((event.clientX - viewport.originX) / viewport.width) * 100;
+      const y = ((event.clientY - viewport.originY) / viewport.height) * 100;
       this.setState(prevState => ({
-        currentShape: [...prevState.currentShape, { x: event.clientX, y: event.clientY }]
+        currentShape: [...prevState.currentShape, { x, y }]
       }));
     },
     10,
     { maxWait: 50 }
   );
 
+  computeViewport = function() {
+    const tile = window.openSeadragon.instance.world.getItemAt(0);
+    const imageOrigin = tile.imageToViewerElementCoordinates(new window.OpenSeadragon.Point(0, 0));
+    const imageSize = tile.imageToViewerElementCoordinates(tile.getContentSize());
+    return {
+      originX: imageOrigin.x,
+      originY: imageOrigin.y,
+      width: imageSize.x - imageOrigin.x,
+      height: imageSize.y - imageOrigin.y
+    };
+  };
+
   render() {
-    const { shapeList, currentShape, isDrawingMode } = this.state;
-    console.log('==>', this.state.openSeadragonViewport);
+    const { shapeList, currentShape, isDrawingMode, openSeadragon } = this.state;
+    if (openSeadragon === null) {
+      return null;
+    }
 
     return (
-      <div
-        id="annotator"
-        className={classNames('annotator', { ['broadCastEvents']: !isDrawingMode })}
-      >
+      <div id="annotator" className={classNames('annotator', { broadCastEvents: !isDrawingMode })}>
         <Overlay shapeList={shapeList} currentShape={currentShape} />
       </div>
     );

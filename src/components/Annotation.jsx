@@ -23,7 +23,13 @@ export default class Annotation extends React.Component {
     );
 
     return (
-      <polygon fill="red" fillOpacity="0.3" stroke="red" strokeWidth="2px" points={polygonPoints} />
+      <polygon
+        fill="red"
+        fillOpacity="0.3"
+        stroke="red"
+        strokeWidth="0.1px"
+        points={polygonPoints}
+      />
     );
   }
 }
