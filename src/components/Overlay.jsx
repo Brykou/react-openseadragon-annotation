@@ -23,13 +23,16 @@ export default class Overlay extends React.Component {
   render() {
     const { shapeList, currentShape } = this.props;
     return (
-      <svg preserveAspectRatio="none" viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`} wdth="100%" height="100%">
-        {
-          shapeList.map((shape, index) => {
-            return <Annotation key={index} points={shape} />;
-          })
-        }
-        { currentShape.length > 0 ? <Annotation points={currentShape} /> : null }
+      <svg
+        preserveAspectRatio="none"
+        viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
+        wdth="100%"
+        height="100%"
+      >
+        {shapeList.map((shape, index) => {
+          return <Annotation key={index} points={shape} />;
+        })}
+        {currentShape.length > 0 ? <Annotation points={currentShape} /> : null}
       </svg>
     );
   }

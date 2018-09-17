@@ -14,10 +14,16 @@ export default class Annotation extends React.Component {
 
   render() {
     const { points } = this.props;
-    const polygonPoints = reduce(points, (sum, point) => {
-      return sum + `${point.x},${point.y} `;
-    }, '');
-    
-    return <polygon fill="red" fillOpacity="0.3" stroke="red" strokeWidth="2px" points={polygonPoints} />;
+    const polygonPoints = reduce(
+      points,
+      (sum, point) => {
+        return sum + `${point.x},${point.y} `;
+      },
+      ''
+    );
+
+    return (
+      <polygon fill="red" fillOpacity="0.3" stroke="red" strokeWidth="2px" points={polygonPoints} />
+    );
   }
 }
