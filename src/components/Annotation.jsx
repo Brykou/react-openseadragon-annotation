@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { reduce } from 'lodash';
 
-export default class Annotation extends React.Component {
+export default class Annotation extends React.PureComponent {
   static propTypes = {
     points: PropTypes.arrayOf(
       PropTypes.shape({
@@ -14,6 +14,8 @@ export default class Annotation extends React.Component {
 
   render() {
     const { points } = this.props;
+
+    // Transform an array of points into a string for polygon
     const polygonPoints = reduce(
       points,
       (sum, point) => {

@@ -39,7 +39,7 @@ export default class Overlay extends React.Component {
     openSeadragon.removeAllHandlers('animation');
   }
 
-  handleResize = event => {
+  handleResize = () => {
     const { getImageViewport } = this.props;
     this.setState({
       viewportSize: getImageViewport()
