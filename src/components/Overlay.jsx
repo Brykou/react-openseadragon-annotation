@@ -22,8 +22,9 @@ export default class Overlay extends React.Component {
 
   constructor(props) {
     super(props);
+    const { getImageViewport } = this.props;
     this.state = {
-      viewportSize: this.computeViewport()
+      viewportSize: getImageViewport()
     };
   }
 
@@ -36,21 +37,10 @@ export default class Overlay extends React.Component {
   }
 
   handleResize = event => {
+    const { getImageViewport } = this.props;
     this.setState({
-      viewportSize: this.computeViewport()
+      viewportSize: getImageViewport()
     });
-  };
-
-  computeViewport = function() {
-    const tile = window.openSeadragon.instance.world.getItemAt(0);
-    const imageOrigin = tile.imageToViewerElementCoordinates(new window.OpenSeadragon.Point(0, 0));
-    const imageSize = tile.imageToViewerElementCoordinates(tile.getContentSize());
-    return {
-      originX: imageOrigin.x,
-      originY: imageOrigin.y,
-      width: imageSize.x - imageOrigin.x,
-      height: imageSize.y - imageOrigin.y
-    };
   };
 
   render() {

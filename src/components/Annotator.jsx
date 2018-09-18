@@ -65,8 +65,9 @@ export default class Annotator extends React.Component {
 
   onMouseMove = debounce(
     event => {
-      const viewport = this.computeViewport();
+      const viewport = this.getImageViewport();
 
+      // Normalize coordinates
       const x = ((event.clientX - viewport.originX) / viewport.width) * 100;
       const y = ((event.clientY - viewport.originY) / viewport.height) * 100;
       this.setState(prevState => ({
@@ -77,7 +78,11 @@ export default class Annotator extends React.Component {
     { maxWait: 50 }
   );
 
-  computeViewport = function() {
+  /**
+   * Compute image viewport in browser coordiniates
+   * @returns Object originX and originY are the top left point of the image
+   */
+  getImageViewport = function() {
     const tile = window.openSeadragon.instance.world.getItemAt(0);
     const imageOrigin = tile.imageToViewerElementCoordinates(new window.OpenSeadragon.Point(0, 0));
     const imageSize = tile.imageToViewerElementCoordinates(tile.getContentSize());
@@ -91,13 +96,19 @@ export default class Annotator extends React.Component {
 
   render() {
     const { shapeList, currentShape, isDrawingMode, openSeadragon } = this.state;
-    if (openSeadragon === null) {
+
+    // Waiting for image to be loaded before rendering Overlay
+    if (get(openSeadragon, 'world', null) === null) {
       return null;
     }
 
     return (
       <div id="annotator" className={classNames('annotator', { broadCastEvents: !isDrawingMode })}>
-        <Overlay shapeList={shapeList} currentShape={currentShape} />
+        <Overlay
+          shapeList={shapeList}
+          currentShape={currentShape}
+          getImageViewport={this.getImageViewport}
+        />
       </div>
     );
   }
