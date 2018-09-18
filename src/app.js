@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { get } from 'lodash';
+import { get, isNil } from 'lodash';
 import OpenSeadragon from './react-openseadragon';
 import Annotator from './components/Annotator';
 
@@ -12,20 +12,27 @@ class App extends Component {
   }
 
   componentDidMount() {
-    if (get(window, 'openSeadragon.instance', null) === null) {
-      const intervalId = setInterval(() => {
-        if (get(window, 'openSeadragon.instance', null) !== null) {
-          this.setState({ openSeadragon: window.openSeadragon.instance });
-          clearInterval(intervalId);
-        }
-      }, 1000);
-    }
+    const intervalId = setInterval(() => {
+      // Wait for world and image to be loaded before loading annotator
+      const OSDWorld = get(window, 'openSeadragon.instance.world', null);
+      if (isNil(OSDWorld) === false && isNil(OSDWorld.getItemAt(0)) === false) {
+        this.setState({ openSeadragon: window.openSeadragon.instance });
+        clearInterval(intervalId);
+      }
+    }, 1000);
   }
 
   render() {
     const { openSeadragon } = this.state;
     return (
-      <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <div
+        style={{
+          width: '100vw',
+          height: '100vh',
+          position: 'relative',
+          transform: 'translate3d(0)'
+        }}
+      >
         <OpenSeadragon
           tileSources="https://image-server.images.test.medmain.com/iiif/2/pidport%2Fimages%2Fpyramidal%2Fcjlvtt4ph000201qllnygn141.tiff"
           showNavigationControl={false}
@@ -34,9 +41,7 @@ class App extends Component {
             window.openSeadragon = openSeadragon;
           }}
         />
-        {get(openSeadragon, 'world', null) === null ? null : (
-          <Annotator openSeadragon={openSeadragon} />
-        )}
+        {openSeadragon === null ? null : <Annotator openSeadragon={openSeadragon} />}
       </div>
     );
   }
