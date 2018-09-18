@@ -1,35 +1,29 @@
 import React from 'react';
-import { debounce, get } from 'lodash';
+import PropTypes from 'prop-types';
+import { debounce } from 'lodash';
 import classNames from 'classnames';
 import Overlay from './Overlay';
 import './Annotator.css';
 
 export default class Annotator extends React.Component {
+  static propTypes = {
+    openSeadragon: PropTypes.object.isRequired
+  };
+
   constructor(props) {
     super(props);
     this.container = null;
     this.state = {
       currentShape: [],
       shapeList: [],
-      openSeadragon: null,
       isDrawingMode: true
     };
   }
 
   componentDidMount() {
-    if (get(window, 'openSeadragon.instance', null) === null) {
-      const intervalId = setInterval(() => {
-        if (get(window, 'openSeadragon.instance', null) !== null) {
-          this.setState({ openSeadragon: window.openSeadragon.instance });
-
-          document.addEventListener('keydown', this.onKeyDown);
-          this.container = document.getElementById('annotator');
-          this.container.addEventListener('mousedown', this.onMouseDown);
-
-          clearInterval(intervalId);
-        }
-      }, 1000);
-    }
+    document.addEventListener('keydown', this.onKeyDown);
+    this.container = document.getElementById('annotator');
+    this.container.addEventListener('mousedown', this.onMouseDown);
   }
 
   componentWillUnmount() {
@@ -45,12 +39,12 @@ export default class Annotator extends React.Component {
     }
   };
 
-  onMouseDown = event => {
+  onMouseDown = () => {
     this.container.addEventListener('mouseup', this.onMouseUp);
     this.container.addEventListener('mousemove', this.onMouseMove);
   };
 
-  onMouseUp = event => {
+  onMouseUp = () => {
     this.onMouseMove.cancel();
     this.setState(prevState => ({
       currentShape: [],
@@ -82,8 +76,9 @@ export default class Annotator extends React.Component {
    * Compute image viewport in browser coordiniates
    * @returns Object originX and originY are the top left point of the image
    */
-  getImageViewport = function() {
-    const tile = window.openSeadragon.instance.world.getItemAt(0);
+  getImageViewport = () => {
+    const { openSeadragon } = this.props;
+    const tile = openSeadragon.world.getItemAt(0);
     const imageOrigin = tile.imageToViewerElementCoordinates(new window.OpenSeadragon.Point(0, 0));
     const imageSize = tile.imageToViewerElementCoordinates(tile.getContentSize());
     return {
@@ -95,12 +90,8 @@ export default class Annotator extends React.Component {
   };
 
   render() {
-    const { shapeList, currentShape, isDrawingMode, openSeadragon } = this.state;
-
-    // Waiting for image to be loaded before rendering Overlay
-    if (get(openSeadragon, 'world', null) === null) {
-      return null;
-    }
+    const { shapeList, currentShape, isDrawingMode } = this.state;
+    const { openSeadragon } = this.props;
 
     return (
       <div id="annotator" className={classNames('annotator', { broadCastEvents: !isDrawingMode })}>
@@ -108,6 +99,7 @@ export default class Annotator extends React.Component {
           shapeList={shapeList}
           currentShape={currentShape}
           getImageViewport={this.getImageViewport}
+          openSeadragon={openSeadragon}
         />
       </div>
     );

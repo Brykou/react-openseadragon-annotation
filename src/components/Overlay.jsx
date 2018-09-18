@@ -17,7 +17,8 @@ export default class Overlay extends React.Component {
         x: PropTypes.number.isRequired,
         y: PropTypes.number.isRequired
       }).isRequired
-    ).isRequired
+    ).isRequired,
+    openSeadragon: PropTypes.object.isRequired
   };
 
   constructor(props) {
@@ -29,11 +30,13 @@ export default class Overlay extends React.Component {
   }
 
   componentDidMount() {
-    window.openSeadragon.instance.addHandler('animation', this.handleResize);
+    const { openSeadragon } = this.props;
+    openSeadragon.addHandler('animation', this.handleResize);
   }
 
   componentWillUnmount() {
-    window.openSeadragon.instance.removeAllHandlers('animation');
+    const { openSeadragon } = this.props;
+    openSeadragon.removeAllHandlers('animation');
   }
 
   handleResize = event => {

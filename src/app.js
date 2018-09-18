@@ -1,9 +1,29 @@
 import React, { Component } from 'react';
+import { get } from 'lodash';
 import OpenSeadragon from './react-openseadragon';
 import Annotator from './components/Annotator';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      openSeadragon: null
+    };
+  }
+
+  componentDidMount() {
+    if (get(window, 'openSeadragon.instance', null) === null) {
+      const intervalId = setInterval(() => {
+        if (get(window, 'openSeadragon.instance', null) !== null) {
+          this.setState({ openSeadragon: window.openSeadragon.instance });
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    }
+  }
+
   render() {
+    const { openSeadragon } = this.state;
     return (
       <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
         <OpenSeadragon
@@ -14,7 +34,9 @@ class App extends Component {
             window.openSeadragon = openSeadragon;
           }}
         />
-        <Annotator />
+        {get(openSeadragon, 'world', null) === null ? null : (
+          <Annotator openSeadragon={openSeadragon} />
+        )}
       </div>
     );
   }
