@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { get, isNil } from 'lodash';
-import OpenSeadragon from './react-openseadragon';
+import OpenSeadragon from './components/openseadragon';
 import Annotator from './components/Annotator';
 
 class App extends Component {
@@ -11,16 +10,9 @@ class App extends Component {
     };
   }
 
-  componentDidMount() {
-    const intervalId = setInterval(() => {
-      // Wait for world and image to be loaded before loading annotator
-      const OSDWorld = get(window, 'openSeadragon.instance.world', null);
-      if (isNil(OSDWorld) === false && isNil(OSDWorld.getItemAt(0)) === false) {
-        this.setState({ openSeadragon: window.openSeadragon.instance });
-        clearInterval(intervalId);
-      }
-    }, 1000);
-  }
+  onOpen = openSeadragon => {
+    this.setState({ openSeadragon: openSeadragon });
+  };
 
   render() {
     const { openSeadragon } = this.state;
@@ -37,9 +29,7 @@ class App extends Component {
           tileSources="https://image-server.images.test.medmain.com/iiif/2/pidport%2Fimages%2Fpyramidal%2Fcjlvtt4ph000201qllnygn141.tiff"
           showNavigationControl={false}
           style={{ width: '100%', height: '100%' }}
-          ref={openSeadragon => {
-            window.openSeadragon = openSeadragon;
-          }}
+          onOpen={this.onOpen}
         />
         {openSeadragon === null ? null : <Annotator openSeadragon={openSeadragon} />}
       </div>

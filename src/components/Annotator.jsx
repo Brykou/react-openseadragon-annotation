@@ -78,8 +78,11 @@ export default class Annotator extends React.Component {
    */
   getImageViewport = () => {
     const { openSeadragon } = this.props;
-    const tile = openSeadragon.world.getItemAt(0);
-    const imageOrigin = tile.imageToViewerElementCoordinates(new window.OpenSeadragon.Point(0, 0));
+    const tile = openSeadragon.instance.world.getItemAt(0);
+
+    const imageOrigin = tile.imageToViewerElementCoordinates(
+      new openSeadragon.namespace.Point(0, 0)
+    );
     const imageSize = tile.imageToViewerElementCoordinates(tile.getContentSize());
     return {
       originX: imageOrigin.x,

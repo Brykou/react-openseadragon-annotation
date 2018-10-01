@@ -31,12 +31,12 @@ export default class Overlay extends React.Component {
 
   componentDidMount() {
     const { openSeadragon } = this.props;
-    openSeadragon.addHandler('animation', this.handleResize);
+    openSeadragon.instance.addHandler('animation', this.handleResize);
   }
 
   componentWillUnmount() {
     const { openSeadragon } = this.props;
-    openSeadragon.removeAllHandlers('animation');
+    openSeadragon.instance.removeAllHandlers('animation');
   }
 
   handleResize = () => {
